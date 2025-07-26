@@ -10,7 +10,7 @@ function love.load()
     w_width = love.graphics.getWidth()
     pX = (w_width - p_width)/2
     pY = (w_height - p_height)
-    p_speed = 120
+    p_speed = 300
     bullets = {}
     enemies =  {}
 end
@@ -22,6 +22,8 @@ function love.update(dt)
         pX = pX - p_speed * dt
     end
     updateBullets(dt)
+    updateEnemies(dt)
+    spawnEnemy(dt)
 
 end
 
@@ -30,6 +32,9 @@ function love.draw()
         love.graphics.draw(player, pX ,pY )
         for _, b in ipairs(bullets) do
             bullet.draw(b)
+        end
+        for _, e in ipairs(enemies) do
+            enemy.draw(e)
         end
         
 end 
@@ -55,4 +60,25 @@ function updateBullets(dt)
     
         end
 
+end
+
+function spawnEnemy(dt)
+    doSpawn = math.random()>0.9
+    if not doSpawn then
+        return
+    end
+
+    local eX = (w_width-enemy.width)*math.random()
+
+    table.insert(enemies,enemy.new(eX))
+end
+
+function updateEnemies(dt)
+    for i=#enemies ,1, -1 do
+        local e = enemies[i]
+        enemy.update(e, dt)
+        if e.y < 0 then
+            table.remove(enemies, i)
+        end
+    end
 end
