@@ -17,10 +17,13 @@ function love.load()
 end
 
 function love.update(dt)
-	if love.keyboard.isDown("right") then
-		pX = pX + p_speed * dt
-	elseif love.keyboard.isDown("left") then
-		pX = pX - p_speed * dt
+	if love.keyboard.isDown("right") and (pX + p_width) < w_width then
+		local calcXR = pX + p_speed*dt
+		local endpos= w_width-p_width
+		pX = calcXR<(endpos)and calcXR or endpos
+	elseif love.keyboard.isDown("left") and pX >0 then
+		local calcXL = pX - p_speed * dt
+		pX = calcXL > 0 and calcXL or 0
 	end
 	updateBullets(dt)
 	updateEnemies(dt)
@@ -95,8 +98,8 @@ end
 function detectCollisions()
   local cx, cy = bucket.getKey(pX, pY)
 
-  for dx = -1, 1 do
-    for dy = -1, 1 do
+  for dx = -2, 2 do
+    for dy = -2, 2 do
       local bx, by = cx + dx, cy + dy
       local bucketRow = enemyGrid[bx]
       local bucket = bucketRow and bucketRow[by]
