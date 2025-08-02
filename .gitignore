@@ -17,6 +17,8 @@ luac.out
 *.gch
 *.pch
 
+.idea/
+
 # Libraries
 *.lib
 *.a
