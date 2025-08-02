@@ -18,10 +18,10 @@ end
 
 function love.update(dt)
 	if love.keyboard.isDown("right") and (pX + p_width) < w_width then
-		local calcXR = pX + p_speed*dt
-		local endpos= w_width-p_width
-		pX = calcXR<(endpos)and calcXR or endpos
-	elseif love.keyboard.isDown("left") and pX >0 then
+		local calcXR = pX + p_speed * dt
+		local endpos = w_width - p_width
+		pX = calcXR < (endpos) and calcXR or endpos
+	elseif love.keyboard.isDown("left") and pX > 0 then
 		local calcXL = pX - p_speed * dt
 		pX = calcXL > 0 and calcXL or 0
 	end
@@ -86,43 +86,38 @@ function updateEnemies(dt)
 	end
 end
 
-
 function addToGrid(enemy)
-  local x, y = bucket.getKey(enemy.x, enemy.y)
-  enemyGrid[x] = enemyGrid[x] or {} -- make sure map exists at x
-  enemyGrid[x][y] = enemyGrid[x][y] or {} -- make sure map exists at x,y
-  table.insert(enemyGrid[x][y], enemy)
+	local x, y = bucket.getKey(enemy.x, enemy.y)
+	enemyGrid[x] = enemyGrid[x] or {}    -- make sure map exists at x
+	enemyGrid[x][y] = enemyGrid[x][y] or {} -- make sure map exists at x,y
+	table.insert(enemyGrid[x][y], enemy)
 end
-
 
 function detectCollisions()
-  local cx, cy = bucket.getKey(pX, pY)
+	local cx, cy = bucket.getKey(pX, pY)
 
-  for dx = -2, 2 do
-    for dy = -2, 2 do
-      local bx, by = cx + dx, cy + dy
-      local bucketRow = enemyGrid[bx]
-      local bucket = bucketRow and bucketRow[by]
+	for dx = -2, 2 do
+		for dy = -2, 2 do
+			local bx, by = cx + dx, cy + dy
+			local bucketRow = enemyGrid[bx]
+			local bucket = bucketRow and bucketRow[by]
 
-      if bucket then
-        for _, e in ipairs(bucket) do
-          if isColliding({ x = pX, y = pY }, e) then
-            print("HIT at bucket", bx, by)
-            -- Handle the collision
-			e.dead=true
-
-          end
-        end
-      end
-    end
-  end
+			if bucket then
+				for _, e in ipairs(bucket) do
+					if isColliding({ x = pX, y = pY }, e) then
+						print("HIT at bucket", bx, by)
+						-- Handle the collision
+						e.dead = true
+					end
+				end
+			end
+		end
+	end
 end
 
-
-
 function isColliding(a, e)
-  return a.x < e.x + enemy.width and
-         a.x + p_width > e.x and
-         a.y < e.y + enemy.height and
-         a.y + p_height > e.y
+	return a.x < e.x + enemy.width and
+		a.x + p_width > e.x and
+		a.y < e.y + enemy.height and
+		a.y + p_height > e.y
 end
