@@ -5,7 +5,7 @@ Enemy.height = 15
 local enemy_speed=200
 
 function Enemy.new(x)
-    return {x=x, y=0}
+    return {x=x, y=0, dead=false}
 end
 
 

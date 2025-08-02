@@ -75,7 +75,7 @@ function updateEnemies(dt)
 	for i = #enemies, 1, -1 do
 		local e = enemies[i]
 		enemy.update(e, dt)
-		if e.y < 0 then
+		if e.y < 0 or e.dead then
 			table.remove(enemies, i)
 		else
 			addToGrid(e)
@@ -106,6 +106,8 @@ function detectCollisions()
           if isColliding({ x = pX, y = pY }, e) then
             print("HIT at bucket", bx, by)
             -- Handle the collision
+			e.dead=true
+
           end
         end
       end
