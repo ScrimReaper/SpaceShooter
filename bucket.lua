@@ -1,5 +1,5 @@
 local bucket = {}
-local cellsize = 20
+local cellsize = 32
 
 
 function bucket.getKey(x, y)
