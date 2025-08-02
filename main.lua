@@ -93,19 +93,26 @@ end
 
 
 function detectCollisions()
-	local center_x, center_y = bucket.getKey(pX, pY)
-	local centerbucket = enemyGrid[center_x] and enemyGrid[center_x][center_y]
-	if not centerbucket then return end
-	
-	
-	for _, e in ipairs(centerbucket) do
+  local cx, cy = bucket.getKey(pX, pY)
 
-		if isColliding({x=pX, y=pY}, e) then
-			print("HIT!!!")
-		end
-		
-	end
+  for dx = -1, 1 do
+    for dy = -1, 1 do
+      local bx, by = cx + dx, cy + dy
+      local bucketRow = enemyGrid[bx]
+      local bucket = bucketRow and bucketRow[by]
+
+      if bucket then
+        for _, e in ipairs(bucket) do
+          if isColliding({ x = pX, y = pY }, e) then
+            print("HIT at bucket", bx, by)
+            -- Handle the collision
+          end
+        end
+      end
+    end
+  end
 end
+
 
 
 function isColliding(a, e)
