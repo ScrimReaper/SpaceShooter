@@ -13,6 +13,7 @@ end
 
 
 
+
 function Bullet.update(b, dt)
 b.y= b.y - bulletspeed * dt
     
@@ -23,8 +24,6 @@ function Bullet.draw(b)
     love.graphics.setColor(1,1,0)
     love.graphics.rectangle("fill",b.x,b.y,Bullet.width, Bullet.height )
     love.graphics.setColor(1,1,0)
-
-    
 end
 
 return Bullet
