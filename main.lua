@@ -1,24 +1,23 @@
-local bullet = require("bullet")
-local enemy = require("enemy")
+local Bullet = require("bullet")
+local Enemy = require("enemy")
 local bucket = require("bucket")
+local Player = require("player")
 HC = require 'libs.HC'
 
-local p_height = 80
-local p_width = 128
 
 function love.load()
     ship_image = love.graphics.newImage("assets/ship_128.png")
 
-    w_height = love.graphics.getHeight()
-    w_width = love.graphics.getWidth()
+    WINDOW_HEIGHT = love.graphics.getHeight()
+    WINDOW_WIDTH = love.graphics.getWidth()
 
     p_width = ship_image:getWidth()
     p_height = ship_image:getHeight()
 
-    pX = (w_width - p_width) / 2
-    pY = (w_height - p_height) - 10
+    pX = (WINDOW_WIDTH - p_width) / 2
+    pY = (WINDOW_HEIGHT - p_height) - 10
 
-    player = HC.circle(pX + p_width / 2, pY + p_height / 2, 16)
+    player = Player.new(pX, pY, ship_image)
 
     p_speed = 300
     bullets = {}
@@ -27,14 +26,7 @@ function love.load()
 end
 
 function love.update(dt)
-    if love.keyboard.isDown("right") and (pX + p_width) < w_width then
-        local calcXR = pX + p_speed * dt
-        local endpos = w_width - p_width
-        pX = calcXR < (endpos) and calcXR or endpos
-    elseif love.keyboard.isDown("left") and pX > 0 then
-        local calcXL = pX - p_speed * dt
-        pX = calcXL > 0 and calcXL or 0
-    end
+    player:update(dt)
     updateBullets(dt)
     updateEnemies(dt)
     spawnEnemy(dt)
@@ -42,30 +34,32 @@ function love.update(dt)
 end
 
 function love.draw()
-    love.graphics.draw(ship_image, pX, pY)
+    player:draw()
     for _, b in ipairs(bullets) do
-        bullet.draw(b)
+        Bullet.draw(b)
     end
     for _, e in ipairs(enemies) do
-        enemy.draw(e)
+        Enemy.draw(e)
     end
 end
 
 function love.keypressed(key)
     if key == "space" then
-        shootBullet()
+        local b = player:shoot()
+        if b then
+            table.insert(bullets, b)
+        end
     end
 end
 
-function shootBullet()
-    table.insert(bullets, bullet.new(pX + p_width / 2, pY))
-end
 
 function updateBullets(dt)
     for i = #bullets, 1, -1 do
         local b = bullets[i]
-        bullet.update(b, dt)
-        if b.y < 0 then
+        Bullet.update(b, dt)
+
+        local x, y, w, h = b:bbox()
+        if y + h < 0 then
             table.remove(bullets, i)
         end
     end
@@ -77,8 +71,8 @@ function spawnEnemy(dt)
         return
     end
 
-    local eX = (w_width - enemy.width) * math.random()
-    local newE = enemy.new(eX)
+    local eX = (WINDOW_WIDTH - Enemy.width) * math.random()
+    local newE = Enemy.new(eX)
     table.insert(enemies, newE)
     addToGrid(newE)
 end
@@ -87,7 +81,7 @@ function updateEnemies(dt)
     enemyGrid = {}
     for i = #enemies, 1, -1 do
         local e = enemies[i]
-        enemy.update(e, dt)
+        Enemy.update(e, dt)
         if e.y < 0 or e.dead then
             table.remove(enemies, i)
         else
@@ -126,8 +120,8 @@ function detectCollisions()
 end
 
 function isColliding(a, e)
-    return a.x < e.x + enemy.width and
+    return a.x < e.x + Enemy.width and
             a.x + p_width > e.x and
-            a.y < e.y + enemy.height and
+            a.y < e.y + Enemy.height and
             a.y + p_height > e.y
 end
