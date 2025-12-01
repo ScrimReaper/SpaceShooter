@@ -1,9 +1,10 @@
 local Bullet = require("bullet")
 local Enemy = require("enemy")
 local Player = require("player")
-local Utils = require("utils")
+local Timer = require("timer")
 local Background = require("background")
 local PopUp = require("popups")
+local HUD = require("hud")
 HC = require 'libs.HC'
 
 function love.load()
@@ -29,12 +30,16 @@ function love.load()
     enemies = {}
     score = 0
     game_over = false
+    HUD.load()
 end
 
 function love.update(dt)
     if game_over then
         return
     end
+
+    HUD.update(dt)
+
     bg:update(dt)
     detectCollisions()
     player:update(dt)
@@ -55,9 +60,8 @@ function love.draw()
         Enemy.draw(e)
     end
 
-    Utils.drawHealthBar(player)
-    Utils.drawScore(score)
     PopUp.drawDamagePopups()
+    HUD.draw(player, score)
 
     if game_over then
         love.graphics.setColor(0, 0, 0, 0.5)
@@ -91,7 +95,10 @@ function restartGame()
     bullets = {}
     enemies = {}
     score = 0
+
     PopUp.clearDamagePopups()
+
+    HUD.reset()
 
     local pX = (WINDOW_WIDTH - ship_image:getWidth()) / 2
     local pY = (WINDOW_HEIGHT - ship_image:getHeight()) - 10
@@ -114,13 +121,24 @@ function updateBullets(dt)
 end
 
 function spawnEnemy(dt)
-    local doSpawn = math.random() > 0.9
+    local difficulty = Timer.getDifficulty()-- 1.0, 1.5, 2.0, ...
+    local baseChance = 0.96                      --
+    local spawnThreshold = baseChance - 0.1 * (difficulty - 1)
+
+    -- cap so it doesn't get insane
+    spawnThreshold = math.max(0.5, spawnThreshold)
+
+    local doSpawn = math.random() > spawnThreshold
     if not doSpawn then
         return
     end
 
     local eX = (WINDOW_WIDTH - Enemy.width) * math.random()
     local newE = Enemy.new(eX, 0, enemy_image)
+
+    -- make this enemy faster based on difficulty
+    newE.speed = newE.speed * difficulty
+
     table.insert(enemies, newE)
 end
 
@@ -152,9 +170,9 @@ function detectCollisions()
                 local enemy = otherShape.owner
                 if enemy then
                     enemy.dead = true
-                    local px = enemy.x + enemy.w/2
-                    local py = enemy.y -10
-                    PopUp.spawnDamagePopup(px,py,player.damage)
+                    local px = enemy.x + enemy.w / 2
+                    local py = enemy.y - 10
+                    PopUp.spawnDamagePopup(px, py, player.damage)
                     HC.remove(enemy.hitbox)
                 end
 
