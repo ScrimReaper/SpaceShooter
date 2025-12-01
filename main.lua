@@ -25,11 +25,11 @@ function love.load()
 end
 
 function love.update(dt)
+    detectCollisions()
     player:update(dt)
     updateBullets(dt)
     updateEnemies(dt)
     spawnEnemy(dt)
-    detectCollisions()
 end
 
 function love.draw()
@@ -58,6 +58,7 @@ function updateBullets(dt)
 
         local x, y, w, h = b:bbox()
         if y + h < 0 then
+            HC.remove(b)
             table.remove(bullets, i)
         end
     end
@@ -77,10 +78,52 @@ end
 function updateEnemies(dt)
     for i = #enemies, 1, -1 do
         local e = enemies[i]
-
-        e:update(dt)
-        if e:getY() > WINDOW_HEIGHT then
+        if e.dead then
             table.remove(enemies, i)
+        else
+
+            e:update(dt)
+            if e:getY() > WINDOW_HEIGHT then
+                HC.remove(e.hitbox)
+                table.remove(enemies, i)
+            end
+        end
+
+    end
+end
+
+function detectCollisions()
+    -- bullet vs others
+    for bi = #bullets, 1, -1 do
+        local b = bullets[bi]
+
+        for otherShape, _ in pairs(HC.collisions(b)) do
+            if otherShape.kind == "enemy" then
+                local enemy = otherShape.owner
+                if enemy then
+                    enemy.dead = true
+                    HC.remove(enemy.hitbox)
+                end
+
+                HC.remove(b)
+                table.remove(bullets, bi)
+                -- remove bullet on hit
+                break -- stop checking this bullet, it's gone
+            end
+        end
+    end
+
+    -- player vs others
+    for otherShape, _ in pairs(HC.collisions(player.hitbox)) do
+        if otherShape.kind == "enemy" then
+            local enemy = otherShape.owner
+            if enemy then
+                enemy.dead = true
+                HC.remove(enemy.hitbox)
+            end
+            print("Player collided with enemy!", enemy)
+            -- handle damage / game over here
         end
     end
 end
+
