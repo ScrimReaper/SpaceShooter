@@ -1,4 +1,5 @@
 local HC = require "libs.HC"
+local Bullet = require("bullet")
 local Player = {}
 Player.__index = Player
 
@@ -23,20 +24,31 @@ function Player.new(x, y, image)
     return self
 end
 
-function Player.update(dt)
+function Player:update(dt)
     if love.keyboard.isDown("right") and (self.x + self.w) < WINDOW_WIDTH then
         local calcX = self.x + self.speed * dt
         local end_pos = WINDOW_WIDTH - self.w
         self.x = math.min(calcX, end_pos)
     elseif love.keyboard.isDown("left") then
         local calcX = self.x - self.speed * dt
-        px = math.max(calcX, 0)
+        self.x = math.max(calcX, 0)
     end
     local hX, hY = calcHitboxPos(self)
     self.hitbox:moveTo(hX, hY)
+    for i = #bullets, 1,-1 do
+        local b = bullets[i]
+    end
 end
 
-function Player.draw()
+function Player:draw()
     love.graphics.draw(self.image, self.x, self.y)
 end
 
+function Player:shoot()
+    local cx,cy = self.hitbox:center()
+    local bulletShape = Bullet.new(cx, self.y)
+    return bulletShape
+end
+
+
+return Player

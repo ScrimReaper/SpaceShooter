@@ -3,21 +3,20 @@ local bulletspeed = 400
 Bullet.width = 4
 Bullet.height = 10
 
-
-
-
 function Bullet.new(x, y)
-    return { x = x - Bullet.width / 2, y = y }
+    local bX = x - Bullet.width / 2
+    local bY = y - Bullet.height / 2
+    local rect = HC.rectangle(bX, bY, Bullet.width, Bullet.height)
+    return rect
 end
 
 function Bullet.update(b, dt)
-    b.y = b.y - bulletspeed * dt
+    local dY = -dt * bulletspeed   -- negative = move up
+    b:move(0, dY)
 end
 
 function Bullet.draw(b)
-    love.graphics.setColor(1, 1, 0)
-    love.graphics.rectangle("fill", b.x, b.y, Bullet.width, Bullet.height)
-    love.graphics.setColor(1, 1, 0)
+    b:draw('fill')
 end
 
 return Bullet
