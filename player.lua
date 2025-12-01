@@ -1,11 +1,8 @@
 local HC = require "libs.HC"
 local Bullet = require("bullet")
+local utils = require("utils")
 local Player = {}
 Player.__index = Player
-
-local function calcHitboxPos(self)
-    return self.x + self.w / 2, self.y + self.h / 2
-end
 
 function Player.new(x, y, image)
     local self = setmetatable({}, Player)
@@ -18,7 +15,7 @@ function Player.new(x, y, image)
     self.y = y or 0
     self.speed = 300
 
-    local hX, hY = calcHitboxPos(self)
+    local hX, hY = utils.calcHitboxPos(self)
     self.hitbox = HC.circle(hX, hY, 16)
 
     return self
@@ -33,11 +30,8 @@ function Player:update(dt)
         local calcX = self.x - self.speed * dt
         self.x = math.max(calcX, 0)
     end
-    local hX, hY = calcHitboxPos(self)
+    local hX, hY = utils.calcHitboxPos(self)
     self.hitbox:moveTo(hX, hY)
-    for i = #bullets, 1,-1 do
-        local b = bullets[i]
-    end
 end
 
 function Player:draw()
@@ -45,10 +39,9 @@ function Player:draw()
 end
 
 function Player:shoot()
-    local cx,cy = self.hitbox:center()
+    local cx, cy = self.hitbox:center()
     local bulletShape = Bullet.new(cx, self.y)
     return bulletShape
 end
-
 
 return Player
