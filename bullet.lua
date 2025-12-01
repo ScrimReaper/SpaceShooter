@@ -1,6 +1,6 @@
 local Bullet = {} --- this holds the functions like .new, .update, like statics in java
 local bulletspeed = 400
-Bullet.width = 4
+Bullet.width = 8
 Bullet.height = 10
 
 function Bullet.new(x, y)
