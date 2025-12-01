@@ -14,6 +14,8 @@ function Player.new(x, y, image)
     self.x = x or 0
     self.y = y or 0
     self.speed = 300
+    self.maxHealth=100
+    self.health = self.maxHealth
 
     local hX, hY = utils.calcHitboxPos(self)
     self.hitbox = HC.circle(hX, hY, 16)
@@ -42,6 +44,14 @@ function Player:shoot()
     local cx, cy = self.hitbox:center()
     local bulletShape = Bullet.new(cx, self.y)
     return bulletShape
+end
+
+function Player:takeDamage(enemy)
+    self.health = self.health - enemy.damage
+    if self.health <=0 then
+        self.health = 0
+        game_over = true
+    end
 end
 
 return Player

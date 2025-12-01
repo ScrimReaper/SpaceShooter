@@ -22,6 +22,7 @@ function love.load()
     bullets = {}
     enemies = {}
     enemyGrid = {}
+    game_over = false
 end
 
 function love.update(dt)
@@ -121,8 +122,7 @@ function detectCollisions()
                 enemy.dead = true
                 HC.remove(enemy.hitbox)
             end
-            print("Player collided with enemy!", enemy)
-            -- handle damage / game over here
+            player:takeDamage(enemy)
         end
     end
 end

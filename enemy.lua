@@ -14,9 +14,11 @@ function Enemy.new(x,y,image)
     self.x = x or 0
     self.y = y or 0
 
-    self.w = 32
-    self.h = 24
+    self.w = 80
+    self.h = 70
     self.speed = 200
+    self.dead = false
+    self.damage = 10
 
     self.scaleX = self.w / image:getWidth()
     self.scaleY = self.h / image:getHeight()
