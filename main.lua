@@ -1,6 +1,7 @@
 local Bullet = require("bullet")
 local Enemy = require("enemy")
 local Player = require("player")
+local Utils = require("utils")
 HC = require 'libs.HC'
 
 function love.load()
@@ -21,11 +22,14 @@ function love.load()
     p_speed = 300
     bullets = {}
     enemies = {}
-    enemyGrid = {}
+    score = 0
     game_over = false
 end
 
 function love.update(dt)
+    if game_over then
+        return
+    end
     detectCollisions()
     player:update(dt)
     updateBullets(dt)
@@ -41,15 +45,48 @@ function love.draw()
     for _, e in ipairs(enemies) do
         Enemy.draw(e)
     end
+
+    Utils.drawHealthBar(player)
+    Utils.drawScore(score)
+
+    if game_over then
+        love.graphics.setColor(0, 0, 0, 0.5)
+        love.graphics.rectangle("fill", 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
+        love.graphics.setColor(1, 0, 0)
+        love.graphics.printf(
+                "GAME OVER\nScore: " .. score .. "\nPress R to restart",
+                0, WINDOW_HEIGHT / 2 - 40,
+                WINDOW_WIDTH, "center"
+        )
+        love.graphics.setColor(1, 1, 1)
+    end
 end
 
 function love.keypressed(key)
+    if game_over then
+        if key == "r" then
+            restartGame()
+        end
+        return
+    end
     if key == "space" then
         local b = player:shoot()
         if b then
             table.insert(bullets, b)
         end
     end
+end
+
+function restartGame()
+    bullets = {}
+    enemies = {}
+    score = 0
+
+    local pX = (WINDOW_WIDTH - ship_image:getWidth()) / 2
+    local pY = (WINDOW_HEIGHT - ship_image:getHeight()) - 10
+    player = Player.new(pX, pY, ship_image)
+
+    game_over = false
 end
 
 function updateBullets(dt)
@@ -99,12 +136,15 @@ function detectCollisions()
         local b = bullets[bi]
 
         for otherShape, _ in pairs(HC.collisions(b)) do
+
             if otherShape.kind == "enemy" then
                 local enemy = otherShape.owner
                 if enemy then
                     enemy.dead = true
                     HC.remove(enemy.hitbox)
                 end
+
+                score = score + 1
 
                 HC.remove(b)
                 table.remove(bullets, bi)
@@ -126,4 +166,6 @@ function detectCollisions()
         end
     end
 end
+
+
 
