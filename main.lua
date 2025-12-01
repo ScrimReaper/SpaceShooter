@@ -2,11 +2,13 @@ local Bullet = require("bullet")
 local Enemy = require("enemy")
 local Player = require("player")
 local Utils = require("utils")
+local Background = require("background")
 HC = require 'libs.HC'
 
 function love.load()
     ship_image = love.graphics.newImage("assets/ship_128.png")
     enemy_image = love.graphics.newImage("assets/space_invader.png")
+    bg_image = love.graphics.newImage("assets/bg.png")
 
     WINDOW_HEIGHT = love.graphics.getHeight()
     WINDOW_WIDTH = love.graphics.getWidth()
@@ -19,6 +21,8 @@ function love.load()
 
     player = Player.new(pX, pY, ship_image)
 
+    bg = Background.new(bg_image)
+
     p_speed = 300
     bullets = {}
     enemies = {}
@@ -30,6 +34,7 @@ function love.update(dt)
     if game_over then
         return
     end
+    bg:update(dt)
     detectCollisions()
     player:update(dt)
     updateBullets(dt)
@@ -38,6 +43,7 @@ function love.update(dt)
 end
 
 function love.draw()
+    bg:draw()
     player:draw()
     for _, b in ipairs(bullets) do
         Bullet.draw(b)
