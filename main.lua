@@ -3,6 +3,7 @@ local Enemy = require("enemy")
 local Player = require("player")
 local Utils = require("utils")
 local Background = require("background")
+local PopUp = require("popups")
 HC = require 'libs.HC'
 
 function love.load()
@@ -40,6 +41,8 @@ function love.update(dt)
     updateBullets(dt)
     updateEnemies(dt)
     spawnEnemy(dt)
+
+    PopUp.updateDamagePopups(dt)
 end
 
 function love.draw()
@@ -54,6 +57,7 @@ function love.draw()
 
     Utils.drawHealthBar(player)
     Utils.drawScore(score)
+    PopUp.drawDamagePopups()
 
     if game_over then
         love.graphics.setColor(0, 0, 0, 0.5)
@@ -87,6 +91,7 @@ function restartGame()
     bullets = {}
     enemies = {}
     score = 0
+    PopUp.clearDamagePopups()
 
     local pX = (WINDOW_WIDTH - ship_image:getWidth()) / 2
     local pY = (WINDOW_HEIGHT - ship_image:getHeight()) - 10
@@ -147,6 +152,9 @@ function detectCollisions()
                 local enemy = otherShape.owner
                 if enemy then
                     enemy.dead = true
+                    local px = enemy.x + enemy.w/2
+                    local py = enemy.y -10
+                    PopUp.spawnDamagePopup(px,py,player.damage)
                     HC.remove(enemy.hitbox)
                 end
 

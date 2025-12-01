@@ -1,6 +1,7 @@
 local HC = require "libs.HC"
 local Bullet = require("bullet")
 local utils = require("utils")
+local PopUp = require("popups")
 local Player = {}
 Player.__index = Player
 
@@ -16,6 +17,7 @@ function Player.new(x, y, image)
     self.speed = 300
     self.maxHealth = 100
     self.health = self.maxHealth
+    self.damage = 20
 
     local hX, hY = utils.calcHitboxPos(self)
     self.hitbox = HC.circle(hX, hY, 16)
@@ -47,7 +49,14 @@ function Player:shoot()
 end
 
 function Player:takeDamage(enemy)
-    self.health = self.health - enemy.damage
+    local dmg = enemy.damage
+    self.health = self.health - dmg
+
+    local px = self.x + self.w / 2
+    local py = self.y - 10
+
+    PopUp.spawnDamagePopup(px, py, dmg)
+
     if self.health <= 0 then
         self.health = 0
         game_over = true
