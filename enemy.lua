@@ -27,6 +27,9 @@ function Enemy.new(x,y,image)
     local cy = y + self.h/2
     self.hitbox = HC.circle(cx, cy, 12)
 
+    self.hitbox.kind = "enemy"
+    self.hitbox.owner = self
+
     return self
 end
 

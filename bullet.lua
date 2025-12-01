@@ -7,6 +7,7 @@ function Bullet.new(x, y)
     local bX = x - Bullet.width / 2
     local bY = y - Bullet.height / 2
     local rect = HC.rectangle(bX, bY, Bullet.width, Bullet.height)
+    rect.kind = "bullet"
     return rect
 end
 
