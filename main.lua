@@ -4,9 +4,9 @@ local bucket = require("bucket")
 local Player = require("player")
 HC = require 'libs.HC'
 
-
 function love.load()
     ship_image = love.graphics.newImage("assets/ship_128.png")
+    enemy_image = love.graphics.newImage("assets/space_invader.png")
 
     WINDOW_HEIGHT = love.graphics.getHeight()
     WINDOW_WIDTH = love.graphics.getWidth()
@@ -52,7 +52,6 @@ function love.keypressed(key)
     end
 end
 
-
 function updateBullets(dt)
     for i = #bullets, 1, -1 do
         local b = bullets[i]
@@ -72,20 +71,17 @@ function spawnEnemy(dt)
     end
 
     local eX = (WINDOW_WIDTH - Enemy.width) * math.random()
-    local newE = Enemy.new(eX)
+    local newE = Enemy.new(eX, 0, enemy_image)
     table.insert(enemies, newE)
-    addToGrid(newE)
 end
 
 function updateEnemies(dt)
-    enemyGrid = {}
     for i = #enemies, 1, -1 do
         local e = enemies[i]
-        Enemy.update(e, dt)
-        if e.y < 0 or e.dead then
+
+        e:update(dt)
+        if e:getY() > WINDOW_HEIGHT then
             table.remove(enemies, i)
-        else
-            addToGrid(e)
         end
     end
 end
