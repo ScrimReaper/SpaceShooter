@@ -1,15 +1,12 @@
 local utils = require("utils")
 
 local Enemy = {}
-Enemy.__index=Enemy
-Enemy.health = 100
+Enemy.__index = Enemy
 Enemy.width = 15
-Enemy.height = 15
-local enemy_speed = 200
 
-function Enemy.new(x,y,image)
+function Enemy.new(x, y, image)
     local self = setmetatable({}, Enemy)
-    self.image=image
+    self.image = image
 
     self.x = x or 0
     self.y = y or 0
@@ -25,8 +22,8 @@ function Enemy.new(x,y,image)
 
 
     -- hitbox
-    local cx = x + self.w/2
-    local cy = y + self.h/2
+    local cx = x + self.w / 2
+    local cy = y + self.h / 2
     self.hitbox = HC.circle(cx, cy, 12)
 
     self.hitbox.kind = "enemy"
@@ -42,8 +39,8 @@ end
 function Enemy:update(dt)
     self.y = self.y + self.speed * dt
 
-    local hx,hy = utils.calcHitboxPos(self)
-    self.hitbox:moveTo(hx,hy)
+    local hx, hy = utils.calcHitboxPos(self)
+    self.hitbox:moveTo(hx, hy)
 end
 
 function Enemy:getY()
