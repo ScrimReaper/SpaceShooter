@@ -1,6 +1,5 @@
 local Bullet = require("bullet")
 local Enemy = require("enemy")
-local bucket = require("bucket")
 local Player = require("player")
 HC = require 'libs.HC'
 
@@ -84,40 +83,4 @@ function updateEnemies(dt)
             table.remove(enemies, i)
         end
     end
-end
-
-function addToGrid(enemy)
-    local x, y = bucket.getKey(enemy.x, enemy.y)
-    enemyGrid[x] = enemyGrid[x] or {}    -- make sure map exists at x
-    enemyGrid[x][y] = enemyGrid[x][y] or {} -- make sure map exists at x,y
-    table.insert(enemyGrid[x][y], enemy)
-end
-
-function detectCollisions()
-    local cx, cy = bucket.getKey(pX, pY)
-
-    for dx = -2, 2 do
-        for dy = -2, 2 do
-            local bx, by = cx + dx, cy + dy
-            local bucketRow = enemyGrid[bx]
-            local bucket = bucketRow and bucketRow[by]
-
-            if bucket then
-                for _, e in ipairs(bucket) do
-                    if isColliding({ x = pX, y = pY }, e) then
-                        print("HIT at bucket", bx, by)
-                        -- Handle the collision
-                        e.dead = true
-                    end
-                end
-            end
-        end
-    end
-end
-
-function isColliding(a, e)
-    return a.x < e.x + Enemy.width and
-            a.x + p_width > e.x and
-            a.y < e.y + Enemy.height and
-            a.y + p_height > e.y
 end
